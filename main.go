@@ -21,8 +21,8 @@ import (
 )
 
 // args
-var host = flag.String("port", ":18080", "http api server listener")
-var fileset = flag.String("fileset", "/Users/hxy/Desktop/生日", "test file directory")
+var host = flag.String("host", ":18080", "http api server listener")
+var fileset = flag.String("fileset", "", "test file directory")
 var dataset = flag.String("dataset", "./", "workspaces database file directory ")
 var workspace = flag.String("workspace", "", "workspaces access endpoints")
 
@@ -65,11 +65,11 @@ func init() {
 	repos := make(server.ApiRepos)
 	for _, w := range enableWorkspaces {
 		//conn
-		collectionConn, err := buntdb.Open(path.Join(*dataset, fmt.Sprintf("%s.collection", w.Id)))
+		collectionConn, err := buntdb.Open(path.Join(*dataset, fmt.Sprintf("%s.c.db", w.Id)))
 		if err != nil {
 			log.Panicln(err)
 		}
-		pathConn, err := buntdb.Open(path.Join(*dataset, fmt.Sprintf("%s.path", w.Id)))
+		pathConn, err := buntdb.Open(path.Join(*dataset, fmt.Sprintf("%s.p.db", w.Id)))
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -148,7 +148,11 @@ func main() {
 
 	// start api server
 	go func() {
-		_ = http.ListenAndServe(*host, cs.Handler(serverRouter))
+		log.Printf("http server is running ：%s", *host)
+		err = http.ListenAndServe(*host, cs.Handler(serverRouter))
+		if err != nil {
+			log.Panicln(err)
+		}
 	}()
 
 	// start proxy servers
@@ -157,6 +161,7 @@ func main() {
 		mock.Load()
 		go func(workspace *api.Workspace, handler http.Handler) {
 
+			log.Printf("%s mock server is running ：%s", workspace.Id, workspace.Host)
 			err := http.ListenAndServe(workspace.Host, cs.Handler(handler))
 			if err != nil {
 				log.Panicln(err)
