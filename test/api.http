@@ -1,0 +1,57 @@
+### 工作区
+GET http://localhost:18080/workspaces
+
+### 接口集
+GET http://localhost:18080/collections?workspaceId=default
+
+### 接口列表
+GET http://localhost:18080/apis?workspaceId=default
+
+### 添加接口
+POST http://localhost:18080/api
+Content-Type: application/json
+
+{
+  "path": "/abc/{type}",
+  "method": "GET",
+  "name": "测试接口",
+  "response": {
+    "header": {
+      "x-resp-a": "abc",
+      "x-resp-id": "{{vars \"type\"}}"
+    },
+    "statusCode": 200,
+    "statusText": "OK",
+    "contentType": "text/plain",
+    "content": "type - {{vars \"type\"}}"
+  }
+}
+
+
+### 查询接口
+GET http://localhost:18080/api/90b0add3-0960-4583-9841-25cbb357b10a
+
+### 删除接口
+DELETE http://localhost:18080/api/54ea72ca-117f-41d2-b404-0daf866104ff
+
+### 修改接口
+PUT http://localhost:18080/api/b9392aa0-1ea4-406c-af06-02eb8dc2fedd
+Content-Type: application/json
+
+{
+  "path": "/abc/{id}",
+  "method": "GET",
+  "name": "测试接口",
+  "response": {
+    "header": {
+      "x-resp-a": "abc"
+    },
+    "statusCode": 200,
+    "statusText": "OK",
+    "contentType": "text/plain",
+    "content": "id - {{vars \"id\"}}"
+  }
+}
+
+
+
