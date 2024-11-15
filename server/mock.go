@@ -122,13 +122,14 @@ func (m *MockProxy) execute(define *api.Define, writer http.ResponseWriter, requ
 	util := &handle.UtilEvaluator{}
 
 	var funcMap = map[string]any{
-		"base64": encode.Base64,
 		"header": req.Header,
-		"vars":   req.Vars,
+		"param":  req.Param,
+		"path":   req.Path,
 		"form":   req.Form,
 		"json":   req.GJson,
 		"rand":   util.Rand,
 		"uuid":   util.Uuid,
+		"encode": encode.Encoded,
 	}
 
 	//rewrite header
@@ -164,14 +165,17 @@ func (m *MockProxy) execute(define *api.Define, writer http.ResponseWriter, requ
 		switch defineBody.RawType {
 		case "json":
 			respContentType = "application/json"
+			break
 		case "xml":
 			respContentType = "application/xml"
+			break
 		case "html":
 			respContentType = "text/html"
+			break
 		default:
 			respContentType = "text/plain"
 		}
-
+		break
 	case "file":
 		//bytes
 		fileBytes, err := os.ReadFile(defineBody.FileValue.Path)
@@ -181,7 +185,7 @@ func (m *MockProxy) execute(define *api.Define, writer http.ResponseWriter, requ
 		}
 		respBytes = fileBytes
 		respContentType = "application/octet-stream"
-
+		break
 	default:
 		//none
 

@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/samber/do"
+	"github.com/samber/lo"
 	"github.com/tidwall/buntdb"
 	"github.com/unrolled/render"
 	"io/fs"
@@ -23,7 +24,7 @@ import (
 // args
 var host = flag.String("host", ":18080", "http api server listener")
 var fileset = flag.String("fileset", "", "test file directory")
-var dataset = flag.String("dataset", "./", "workspaces database file directory ")
+var dataset = flag.String("dataset", "./", "workspaces database file directory")
 var workspace = flag.String("workspace", "", "workspaces access endpoints")
 
 var serverRouter = mux.NewRouter()
@@ -65,11 +66,11 @@ func init() {
 	repos := make(server.ApiRepos)
 	for _, w := range enableWorkspaces {
 		//conn
-		collectionConn, err := buntdb.Open(path.Join(*dataset, fmt.Sprintf("%s.c.db", w.Id)))
+		collectionConn, err := buntdb.Open(lo.Ternary(*dataset == "", ":memory:", path.Join(*dataset, fmt.Sprintf("%s.c.db", w.Id))))
 		if err != nil {
 			log.Panicln(err)
 		}
-		pathConn, err := buntdb.Open(path.Join(*dataset, fmt.Sprintf("%s.p.db", w.Id)))
+		pathConn, err := buntdb.Open(lo.Ternary(*dataset == "", ":memory:", path.Join(*dataset, fmt.Sprintf("%s.p.db", w.Id))))
 		if err != nil {
 			log.Panicln(err)
 		}

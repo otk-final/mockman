@@ -201,6 +201,9 @@ const SaveAsModal = forwardRef<SaveAsModalHandle, SaveAsModalProps>(({ workspace
 
     //保存
     const handleCompleted = async () => {
+        if(state?.collectId === ""){
+            return message.warning("required a collection/folder")
+        }
         const ok = await serverApi.saveApi(workspaceId, state!).catch(e => message.error(e || e.message))
         if (ok === undefined) {
             return
@@ -209,7 +212,7 @@ const SaveAsModal = forwardRef<SaveAsModalHandle, SaveAsModalProps>(({ workspace
         onCompleted(state!)
     }
 
-    return <Modal title={"Save Mock"}
+    return <Modal title={"Save Mock Api"}
         width={800}
         open={open}
         onCancel={() => setOpen(false)}

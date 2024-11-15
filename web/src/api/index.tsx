@@ -118,16 +118,40 @@ export class MockApi {
     }
 
 
+    public contentType(dataType: string, rawType: string) {
+        if (dataType === "form") {
+            return "application/x-www-form-urlencoded"
+        }
+        if (dataType === "raw") {
+            if (rawType === "json") {
+                return ""
+            }
+            if (rawType === "xml") {
+                return "application/xml"
+            }
+            if (rawType === "html") {
+                return "text/html"
+            }
+
+            return "text/plain"
+        }
+    }
+
     public async call(req: ApiRequestDefine<HttpBody>) {
 
         //only support form or raw
         const body = req.body.dataType === "form" ? this.toPartial(req.body.formValue) : req.body.rawValue;
 
+        //覆盖默认请求头
+        const reqContentType = this.contentType(req.body.dataType, req.body.rawType)
+        const reqHeaders = { ...this.toPartial(req.headers), "content-type": reqContentType }
+
+
         const callResp = await this.client.request({
             method: req.method,
             url: req.path,
             params: this.toPartial(req.parmaters),
-            headers: this.toPartial(req.headers),
+            headers: reqHeaders,
             data: body,
             responseType: "arraybuffer",
             validateStatus: () => { return true }
@@ -175,7 +199,7 @@ export class MockApi {
     private toPartial(fields: KVField[]): Partial<Record<string, string>> {
         const record: Partial<Record<string, string>> = {}
         fields.forEach(e => {
-            record[e.key] = e.value
+            record[e.key.toLowerCase()] = e.value
         })
         return record
     }

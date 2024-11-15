@@ -18,23 +18,18 @@ func (r *RequestEvaluator) Header(args ...string) (string, error) {
 	return r.Request.Header.Get(args[0]), nil
 }
 
-func (r *RequestEvaluator) Vars(args ...string) (string, error) {
-
-	// 当路由参数变更后，无法获取到最新的路径变量
-	// 旧 /abc/{id}
-	// 新 /abc/{id2}
-	// 重新识别路径
-	// vars := mux.Vars(r.Request)
-
-	var match = &mux.RouteMatch{}
-	mux.NewRouter().Path(r.Define.Path).Match(r.Request, match)
-	vars := match.Vars
-
+func (r *RequestEvaluator) Path(args ...string) (string, error) {
+	vars := mux.Vars(r.Request)
 	val, ok := vars[args[0]]
 	if ok {
 		return val, nil
 	}
 	return "", ErrNotFound
+}
+
+func (r *RequestEvaluator) Param(args ...string) (string, error) {
+	values := r.Request.URL.Query()
+	return values.Get(args[0]), nil
 }
 
 func (r *RequestEvaluator) Form(args ...string) (string, error) {

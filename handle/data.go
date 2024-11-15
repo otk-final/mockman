@@ -2,32 +2,19 @@ package handle
 
 import (
 	"encoding/base64"
-	"io"
-	"net/http"
-	"os"
-	"strings"
+	"encoding/hex"
 )
 
 type EncodeEvaluator struct {
 }
 
-func (e *EncodeEvaluator) Base64(args ...string) (string, error) {
-
-	path := args[0]
-	if strings.HasPrefix(path, "http") {
-		resp, err := http.Get(args[0])
-		if err != nil {
-			return "", err
-		}
-		defer resp.Body.Close()
-		data, _ := io.ReadAll(resp.Body)
-		return base64.StdEncoding.EncodeToString(data), nil
+func (e *EncodeEvaluator) Encoded(args ...string) (string, error) {
+	method, target := args[0], args[1]
+	if method == "base64" {
+		return base64.StdEncoding.EncodeToString([]byte(target)), nil
 	}
-
-	//native file
-	data, err := os.ReadFile(args[0])
-	if err != nil {
-		return "", err
+	if method == "hex" {
+		return hex.EncodeToString([]byte(target)), nil
 	}
-	return base64.StdEncoding.EncodeToString(data), nil
+	return "", ErrArgs
 }
