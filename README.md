@@ -23,7 +23,7 @@ go build .
 
 ## Quick start
 ```sh
-./mockman -host=:18080
+./mockman_linux -host=:18080
 ```
 * `host`	
 server host，access `http://127.0.0.1:18080` in the browser
@@ -50,7 +50,7 @@ when you want to enable multiple workspaces or overwrite default configuration, 
 ```
 you can run 
 ```sh
-./mockman -host=:18080 -workspace=./file.json
+./mockman_linux -host=:18080 -workspace=./file.json
 ```
 
 ## Extension methods
